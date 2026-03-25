@@ -1,0 +1,112 @@
+﻿@model UMS.Models.UsersModel
+
+@{
+    ViewData["Title"] = "Add User";
+}
+
+<div class="validation-summary" data-valmsg-summary="ModelOnly" class="text-danger mb-3" style="display: none;">
+    <ul></ul>
+</div>
+
+<h2>Add New User</h2>
+
+<form asp-action="AddUsers" method="post">
+
+    <div class="form-group">
+        <label asp-for="FirstName">First Name</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Username">Username</label>
+        <input asp-for="Username" class="form-control" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" type="email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Add User
+    </button>
+    <a href="/" class="btn btn-secondary">Back to Home</a>
+
+</form>
+
+<script>
+    $(document).ready(function() {
+        // Form validation and submission
+        $('form').on('submit', function(e) {
+            // Clear previous validation
+            $('.validation-summary').hide();
+            
+            // Check if form is valid
+            if (!$(this).valid()) {
+                e.preventDefault();
+                showErrorModal(
+                    'Validation Error!',
+                    'Please fix the following errors:',
+                    'All required fields must be filled out correctly before submitting.'
+                );
+                
+                // Shake the form
+                $(this).addClass('shake');
+                setTimeout(() => {
+                    $(this).removeClass('shake');
+                }, 500);
+                
+                return false;
+            }
+            
+            // Get form data and save to localStorage before submission
+            const formData = {
+                id: Date.now(), // Use timestamp as temporary ID
+                firstName: $('#FirstName').val(),
+                username: $('#Username').val(),
+                email: $('#Email').val()
+            };
+            
+            // Save to localStorage
+            let users = JSON.parse(localStorage.getItem('umsUsers') || '[]');
+            users.push(formData);
+            localStorage.setItem('umsUsers', JSON.stringify(users));
+            
+            // Create celebration particles for successful submission
+            const rect = $(this).find('button[type="submit"]')[0].getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            for(let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    createParticle(
+                        x + (Math.random() - 0.5) * 200,
+                        y + (Math.random() - 0.5) * 100,
+                        ['<i class="fas fa-users text-primary"></i>', 
+                         '<i class="fas fa-star text-warning"></i>', 
+                         '<i class="fas fa-check text-success"></i>', 
+                         '<i class="fas fa-award text-info"></i>', 
+                         '<i class="fas fa-trophy text-danger"></i>'][Math.floor(Math.random() * 5)]
+                    );
+                }, i * 100);
+            }
+            
+            // Show success modal after a delay
+            setTimeout(() => {
+                showSuccessModal(
+                    'User Added Successfully!',
+                    'The new user has been added to the system.',
+                    'You can now view and manage the user from the user list.'
+                );
+                
+                // Redirect to users list after showing modal
+                setTimeout(() => {
+                    window.location.href = '/Users/getusers';
+                }, 2000);
+            }, 800);
+        });
+    });
+</script>

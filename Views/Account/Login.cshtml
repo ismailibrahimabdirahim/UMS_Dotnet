@@ -1,0 +1,363 @@
+@model UMS.Models.LoginModel
+@{
+    ViewData["Title"] = "Login - UMS";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 380px;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @@keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        .login-header p {
+            color: #666;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .logo {
+            font-size: 36px;
+            color: #667eea;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .admin-info {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(200, 35, 51, 0.1) 100%);
+            border: 2px solid #dc3545;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .admin-title {
+            font-weight: 600;
+            color: #dc3545;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .admin-features {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .admin-credentials {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #dc3545;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .admin-credentials strong {
+            color: #dc3545;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+            font-size: 13px;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+        .input-icon-wrap .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 15px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .form-control {
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            padding: 12px 15px 12px 42px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .spinner-border {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @@keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        .form-check {
+            margin-bottom: 15px;
+        }
+
+        .form-check-input:checked {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .form-check-label {
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h2>University Management System</h2>
+            <p>Admin Login - Full System Control</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="Username" class="form-label">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <div class="input-icon-wrap">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" class="form-control" id="Username" name="Username"
+                           placeholder="Enter admin username" value="admin" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Password" class="form-label">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <div class="input-icon-wrap">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" class="form-control" id="Password" name="Password"
+                           placeholder="Enter admin password" value="admin123" required>
+                </div>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="showPassword">
+                <label class="form-check-label" for="showPassword">
+                    <i class="fas fa-eye"></i> Show Password
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-login" id="loginBtn">
+                <i class="fas fa-crown"></i> Admin Login
+            </button>
+        </form>
+
+        <!-- Demo Login Info - Moved After Login Button -->
+        <div class="admin-info">
+            <div class="admin-title">
+                <i class="fas fa-info-circle"></i> Demo Login Credentials
+            </div>
+            <div class="admin-credentials">
+                <strong>Username:</strong> admin<br>
+                <strong>Password:</strong> admin123
+            </div>
+            <div class="admin-features">
+                <small>Full admin access to manage Users, Teachers, and Students</small>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Show/Hide Password Toggle
+            $('#showPassword').on('change', function() {
+                const passwordField = $('#Password');
+                const isChecked = $(this).is(':checked');
+                
+                if (isChecked) {
+                    // Show password
+                    passwordField.attr('type', 'text');
+                    $(this).siblings('label').html('<i class="fas fa-eye-slash"></i> Hide Password');
+                } else {
+                    // Hide password
+                    passwordField.attr('type', 'password');
+                    $(this).siblings('label').html('<i class="fas fa-eye"></i> Show Password');
+                }
+            });
+
+            $('#loginForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const $btn = $('#loginBtn');
+                const $alertContainer = $('#alertContainer');
+                
+                $btn.addClass('loading').html('<span class="spinner-border spinner-border-sm" role="status"></span>Authenticating...');
+                $alertContainer.empty();
+                
+                const formData = {
+                    Username: $('#Username').val(),
+                    Password: $('#Password').val(),
+                    RememberMe: false // Always false since we removed remember me
+                };
+                
+                $.ajax({
+                    url: '/Account/Login',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            $btn.removeClass('loading').html('<i class="fas fa-check"></i> Success!');
+                            $alertContainer.html(`
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i> ${response.message}
+                                </div>
+                            `);
+                            
+                            setTimeout(function() {
+                                window.location.href = response.redirectUrl;
+                            }, 1000);
+                        } else {
+                            $btn.removeClass('loading').html('<i class="fas fa-crown"></i> Admin Login');
+                            $alertContainer.html(`
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle"></i> ${response.message}
+                                </div>
+                            `);
+                        }
+                    },
+                    error: function() {
+                        $btn.removeClass('loading').html('<i class="fas fa-crown"></i> Admin Login');
+                        $alertContainer.html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i> An error occurred. Please try again.
+                            </div>
+                        `);
+                    }
+                });
+            });
+            
+            // Ensure cursor starts at beginning when any input is focused
+            $('#Username, #Password').on('focus', function() {
+                const el = this;
+                setTimeout(function() {
+                    if (el.setSelectionRange) {
+                        el.setSelectionRange(0, 0);
+                    }
+                }, 0);
+            });
+
+            // Initial auto-focus on username
+            const $username = $('#Username');
+            if ($username.length) {
+                setTimeout(function() {
+                    $username.focus();
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

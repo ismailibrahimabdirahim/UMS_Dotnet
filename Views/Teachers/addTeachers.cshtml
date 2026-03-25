@@ -1,0 +1,99 @@
+@model UMS.Models.TeachersModel
+@{
+    ViewData["Title"] = "Add Teacher";
+}
+
+<div class="validation-summary" data-valmsg-summary="ModelOnly" class="text-danger mb-3" style="display: none;">
+    <ul></ul>
+</div>
+
+<h2>Add New Teacher</h2>
+
+<form asp-action="AddTeachers" method="post">
+
+    <div class="form-group">
+        <label asp-for="FirstName">First Name</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LastName">Last Name</label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Subject">Subject</label>
+        <input asp-for="Subject" class="form-control" />
+        <span asp-validation-for="Subject" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" type="email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-chalkboard-teacher"></i> Add Teacher
+    </button>
+    <a href="/" class="btn btn-secondary">Back to Home</a>
+
+</form>
+
+<script>
+    $(document).ready(function() {
+        // Form validation and submission
+        $('form').on('submit', function(e) {
+            // Clear previous validation
+            $('.validation-summary').hide();
+            
+            // Check if form is valid
+            if (!$(this).valid()) {
+                e.preventDefault();
+                showErrorModal(
+                    'Validation Error!',
+                    'Please fix the following errors:',
+                    'All required fields must be filled out correctly before submitting.'
+                );
+                
+                // Shake the form
+                $(this).addClass('shake');
+                setTimeout(() => {
+                    $(this).removeClass('shake');
+                }, 500);
+                
+                return false;
+            }
+            
+            // Create celebration particles for successful submission
+            const rect = $(this).find('button[type="submit"]')[0].getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            for(let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    createParticle(
+                        x + (Math.random() - 0.5) * 200,
+                        y + (Math.random() - 0.5) * 100,
+                        ['<i class="fas fa-chalkboard-teacher text-primary"></i>', 
+                         '<i class="fas fa-star text-warning"></i>', 
+                         '<i class="fas fa-check text-success"></i>', 
+                         '<i class="fas fa-award text-info"></i>', 
+                         '<i class="fas fa-trophy text-danger"></i>'][Math.floor(Math.random() * 5)]
+                    );
+                }, i * 100);
+            }
+            
+            // Show success modal after a delay
+            setTimeout(() => {
+                showSuccessModal(
+                    'Teacher Added Successfully!',
+                    'The new teacher has been added to the system.',
+                    'You can now view and manage the teacher from the teacher list.'
+                );
+            }, 800);
+        });
+    });
+</script>

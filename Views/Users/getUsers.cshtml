@@ -1,0 +1,306 @@
+﻿@model List<UMS.Models.UsersModel>
+
+@{
+    ViewData["Title"] = "All Users";
+}
+
+<h2>@ViewData["title"]</h2>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="successModalLabel">
+                    <i class="fas fa-check-circle text-success me-2"></i>Success!
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="success-icon mb-3">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="success-message text-success">Operation Completed Successfully!</h4>
+                <p class="text-muted" id="successDetails">Your action has been completed successfully.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3">
+    <a href="/Users/addusers" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Add New User
+    </a>
+</div>
+
+<div id="usersContainer">
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fa-solid fa-user-slash" style="font-size: 4rem; color: #94a3b8;"></i>
+            <h4 class="mt-3">No Users Found</h4>
+            <p class="text-muted">Start by adding your first user to the system.</p>
+            <a href="/Users/addusers" class="btn-gradient">
+                <i class="fa-solid fa-plus"></i> Add New User
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.Id</td>
+                            <td>@user.FirstName</td>
+                            <td>@user.Username</td>
+                            <td>@user.Email</td>
+                            <td>
+                                <a href="/Users/viewuser/@user.Id" class="btn-action btn-view">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="/Users/edituser/@user.Id" class="btn-action btn-edit">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <form asp-action="DeleteUser" asp-route-id="@user.Id" method="post" style="display:inline;">
+                                    <button type="submit" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete this user?')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="mt-4 text-center">
+    <div class="alert alert-info">
+        <h4><i class="fas fa-users"></i> Total Users: <span id="totalUsersCount">@Model.Count()</span></h4>
+    </div>
+</div>
+
+<!-- Beautiful Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                    Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-user-times fa-3x text-danger"></i>
+                </div>
+                <h5>Are you sure you want to delete this user?</h5>
+                <p class="text-muted mb-0">
+                    <strong id="deleteItemName"></strong>
+                </p>
+                <p class="text-danger small">
+                    <i class="fas fa-exclamation-circle"></i>
+                    This action cannot be undone!
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-danger btn-lg px-4" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i> Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let deleteId = null;
+
+    function confirmDelete(id, name) {
+        deleteId = id;
+        document.getElementById('deleteItemName').textContent = name;
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (deleteId) {
+            window.location.href = '/Users/deleteuser/' + deleteId;
+        }
+    });
+</script>
+
+<style>
+/* Modern Action Buttons */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    margin-right: 8px;
+}
+
+.btn-action::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-action:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* View Button - Modern Blue */
+.btn-view {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-view:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.btn-view::before {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Edit Button - Modern Orange */
+.btn-edit {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
+}
+
+.btn-edit::before {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Delete Button - Modern Red */
+.btn-delete {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #fee140 0%, #fa709a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(250, 112, 154, 0.6);
+}
+
+.btn-delete::before {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Icon animations */
+.btn-action i {
+    transition: transform 0.3s ease;
+}
+
+.btn-view:hover i {
+    transform: scale(1.1);
+}
+
+.btn-edit:hover i {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.btn-delete:hover i {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* Success Modal Animations */
+.success-icon i {
+    animation: successPulse 1.5s ease-in-out infinite;
+}
+
+@@keyframes successPulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.success-message {
+    animation: slideInUp 0.6s ease-out;
+}
+
+@@keyframes slideInUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive adjustments */
+@@media (max-width: 768px) {
+    .btn-action {
+        padding: 6px 12px;
+        font-size: 12px;
+        margin-right: 4px;
+    }
+    
+    .btn-action i {
+        font-size: 12px;
+    }
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    // Check for success message in TempData and show modal
+    var successMessage = '@TempData["SuccessMessage"]';
+    if (successMessage && successMessage !== '') {
+        $('#successDetails').text(successMessage);
+        $('#successModal').modal('show');
+        
+        // Auto-hide after 3 seconds
+        setTimeout(function() {
+            $('#successModal').modal('hide');
+        }, 3000);
+    }
+});
+</script>

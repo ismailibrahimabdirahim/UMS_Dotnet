@@ -1,0 +1,121 @@
+@model UMS.Models.Studentsmodel
+@{
+    ViewData["Title"] = "Add Student";
+}
+
+<div class="validation-summary" data-valmsg-summary="ModelOnly" class="text-danger mb-3" style="display: none;">
+    <ul></ul>
+</div>
+
+<div class="hero-section">
+    <h1 class="hero-title">
+        <i class="fas fa-user-plus"></i> Add New Student
+    </h1>
+    <p class="hero-subtitle">Register a new student to the university management system</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-edit"></i> Student Information</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="AddStudents" method="post">
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <div class="form-group">
+                                <label asp-for="Name" class="form-label fw-bold">
+                                    <i class="fas fa-user"></i> Student Name
+                                </label>
+                                <input asp-for="Name" class="form-control form-control-lg" placeholder="Enter student's full name" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <div class="form-group">
+                                <label asp-for="batch" class="form-label fw-bold">
+                                    <i class="fas fa-layer-group"></i> Batch/Class
+                                </label>
+                                <input asp-for="batch" class="form-control form-control-lg" placeholder="e.g., 2024-CS, 2025-EE" />
+                                <span asp-validation-for="batch" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="/" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-arrow-left"></i> Back to Home
+                                </a>
+                                <button type="submit" class="btn-gradient btn-lg">
+                                    <i class="fas fa-user-plus"></i> Add Student
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        $(document).ready(function() {
+            // Form validation and submission
+            $('form').on('submit', function(e) {
+                // Clear previous validation
+                $('.validation-summary').hide();
+                
+                // Check if form is valid
+                if (!$(this).valid()) {
+                    e.preventDefault();
+                    showErrorModal(
+                        'Validation Error!',
+                        'Please fix the following errors:',
+                        'All required fields must be filled out correctly before submitting.'
+                    );
+                    
+                    // Shake the form
+                    $(this).addClass('shake');
+                    setTimeout(() => {
+                        $(this).removeClass('shake');
+                    }, 500);
+                    
+                    return false;
+                }
+                
+                // Create celebration particles for successful submission
+                const rect = $(this).find('button[type="submit"]')[0].getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                
+                for(let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        createParticle(
+                            x + (Math.random() - 0.5) * 200,
+                            y + (Math.random() - 0.5) * 100,
+                            ['<i class="fas fa-graduation-cap text-primary"></i>', 
+                             '<i class="fas fa-star text-warning"></i>', 
+                             '<i class="fas fa-check text-success"></i>', 
+                             '<i class="fas fa-award text-info"></i>', 
+                             '<i class="fas fa-trophy text-danger"></i>'][Math.floor(Math.random() * 5)]
+                        );
+                    }, i * 100);
+                }
+                
+                // Show success modal after a delay
+                setTimeout(() => {
+                    showSuccessModal(
+                        'Student Added Successfully!',
+                        'The new student has been added to the system.',
+                        'You can now view and manage the student from the student list.'
+                    );
+                }, 800);
+            });
+        });
+    </script>

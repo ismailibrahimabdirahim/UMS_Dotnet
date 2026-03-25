@@ -1,0 +1,31 @@
+@model UMS.Models.TeachersModel
+
+@{
+    ViewData["Title"] = "Teacher Details";
+}
+
+<h2>@ViewData["title"]</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Teacher Information</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Teacher ID:</strong> @Model.Id</p>
+                <p><strong>First Name:</strong> @Model.FirstName</p>
+                <p><strong>Last Name:</strong> @Model.LastName</p>
+                <p><strong>Subject:</strong> @Model.Subject</p>
+                <p><strong>Email:</strong> @Model.Email</p>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <a href="/Teachers/editteacher/@Model.Id" class="btn btn-warning">Edit Teacher</a>
+            <a href="/Teachers/addteachers" class="btn btn-primary">Add New Teacher</a>
+            <a href="/Teachers/getteachers" class="btn btn-secondary">Back to Teachers</a>
+            <a href="/" class="btn btn-info">Back to Home</a>
+        </div>
+    </div>
+</div>

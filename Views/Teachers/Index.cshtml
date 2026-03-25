@@ -1,0 +1,235 @@
+@model IEnumerable<UMS.Models.TeachersModel>
+
+@{
+    ViewData["Title"] = "All Teachers";
+}
+
+<div class="hero-section">
+    <h1 class="hero-title slide-in-top">
+        <i class="fa-solid fa-chalkboard-teacher"></i> Teacher Management
+    </h1>
+    <p class="hero-subtitle slide-in-bottom">View and manage all registered teachers in the system</p>
+</div>
+
+<!-- Success Message -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show zoom-in" role="alert">
+        <i class="fas fa-check-circle"></i> <strong>Success!</strong> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fa-solid fa-users"></i> All Teachers (@Model.Count())</h3>
+    </div>
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fa-solid fa-user-slash" style="font-size: 4rem; color: #94a3b8;"></i>
+                <h4 class="mt-3">No Teachers Found</h4>
+                <p class="text-muted">Start by adding your first teacher to the system.</p>
+                <a href="/teachers/addteacher" class="btn-gradient">
+                    <i class="fa-solid fa-plus"></i> Add First Teacher
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fa-solid fa-hashtag"></i> ID</th>
+                            <th><i class="fa-solid fa-user"></i> Name</th>
+                            <th><i class="fa-solid fa-book-open-reader"></i> Subject</th>
+                            <th><i class="fa-solid fa-envelope"></i> Email</th>
+                            <th><i class="fa-solid fa-gears"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var teacher in Model)
+                        {
+                            <tr class="teacher-row" data-id="@teacher.Id">
+                                <td>
+                                    <span class="badge bg-primary">@teacher.Id</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-gradient-primary text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            @teacher.FirstName.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <strong>@teacher.FirstName @teacher.LastName</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@teacher.Subject</span>
+                                </td>
+                                <td>
+                                    <a href="mailto:@teacher.Email" class="text-decoration-none">
+                                        <i class="fas fa-envelope"></i> @teacher.Email
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/teachers/ViewTeacher/@teacher.Id" class="btn btn-sm btn-outline-primary" title="View">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <a href="/teachers/EditTeacher/@teacher.Id" class="btn btn-sm btn-outline-warning" title="Edit">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <form asp-action="DeleteTeacher" method="post" style="display: inline;">
+                                            <input type="hidden" name="id" value="@teacher.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger delete-btn" title="Delete" 
+                                                    onclick="return confirm('Are you sure you want to delete @teacher.FirstName @teacher.LastName?')">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        
+        <div class="mt-4 text-center">
+            <a href="/teachers/addteacher" class="btn-gradient btn-lg">
+                <i class="fa-solid fa-chalkboard-teacher"></i> Add New Teacher
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .delete-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+    }
+    
+    .teacher-row {
+        transition: all 0.3s ease;
+    }
+    
+    .teacher-row:hover {
+        background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+        transform: translateX(5px);
+    }
+    
+    .btn-group .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-group .btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Add delete animation with modal
+        $('.delete-btn').on('click', function(e) {
+            e.preventDefault();
+            const row = $(this).closest('.teacher-row');
+            const teacherName = row.find('strong').text();
+            const form = $(this).closest('form');
+            
+            // Show warning modal
+            showWarningModal(
+                'Delete Teacher',
+                `Are you sure you want to delete ${teacherName}?`,
+                'This action cannot be undone. The teacher will be permanently removed from the system.',
+                function() {
+                    // User confirmed deletion
+                    const rect = $(e.currentTarget)[0].getBoundingClientRect();
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+                    
+                    // Create explosion effect
+                    for(let i = 0; i < 8; i++) {
+                        setTimeout(() => {
+                            createParticle(
+                                x + (Math.random() - 0.5) * 150,
+                                y + (Math.random() - 0.5) * 100,
+                                ['<i class="fas fa-times-circle text-danger"></i>', 
+                                 '<i class="fas fa-fire text-warning"></i>', 
+                                 '<i class="fas fa-burst text-primary"></i>', 
+                                 '<i class="fas fa-explosion text-danger"></i>', 
+                                 '<i class="fas fa-trash text-warning"></i>'][Math.floor(Math.random() * 5)]
+                            );
+                        }, i * 50);
+                    }
+                    
+                    // Shake and fade out the row
+                    row.addClass('shake');
+                    setTimeout(() => {
+                        row.css('transition', 'all 0.5s ease');
+                        row.css('opacity', '0');
+                        row.css('transform', 'translateX(-100%)');
+                    }, 500);
+                    
+                    // Submit the form
+                    form.submit();
+                }
+            );
+        });
+        
+        // Add hover particle effects
+        $('.teacher-row').on('mouseenter', function() {
+            const rect = this.getBoundingClientRect();
+            createParticle(rect.left, rect.top + rect.height / 2, '🎓');
+        });
+        
+        // Show success message if present
+        var successMessage = '@Html.Raw(TempData["SuccessMessage"]?.ToString() ?? "")';
+        if(successMessage && successMessage.length > 0) {
+            setTimeout(() => {
+                showSuccessModal('Success!', successMessage, 'The operation was completed successfully.');
+            }, 500);
+        }
+    });
+    
+    // Override the showWarningModal to accept callback
+    function showWarningModal(title, message, description, callback) {
+        const modal = $('#customModal');
+        const modalTitle = $('#modalTitle');
+        const modalMessage = $('#modalMessage');
+        const modalDescription = $('#modalDescription');
+        const modalIcon = $('#modalIcon');
+        const modalContent = $('.modal-content');
+        
+        modalContent.removeClass('success-modal error-modal warning-modal info-modal');
+        modalContent.addClass('warning-modal');
+        modalIcon.html('<i class="fas fa-exclamation"></i>');
+        
+        modalTitle.text(title);
+        modalMessage.text(message);
+        modalDescription.text(description);
+        
+        // Change button text and action
+        const modalFooter = $('.modal-footer');
+        modalFooter.html(`
+            <button type="button" class="btn btn-secondary btn-lg me-2" onclick="closeCustomModal()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-danger btn-lg" onclick="confirmDelete()">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        `);
+        
+        // Store callback for confirmation
+        window.deleteCallback = callback;
+        
+        modal.addClass('show');
+    }
+    
+    function confirmDelete() {
+        if (window.deleteCallback) {
+            window.deleteCallback();
+        }
+        closeCustomModal();
+    }
+</script>

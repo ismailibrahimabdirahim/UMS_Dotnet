@@ -1,0 +1,245 @@
+﻿@{
+    ViewData["Title"] = "University Management System";
+}
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="loginModalLabel">
+                    <i class="fas fa-graduation-cap text-primary"></i> Login to UMS
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loginAlertContainer"></div>
+                <form id="modalLoginForm">
+                    <div class="mb-3">
+                        <label for="modalUsername" class="form-label">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" class="form-control" id="modalUsername" name="Username" 
+                                   placeholder="Enter your username" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalPassword" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" class="form-control" id="modalPassword" name="Password" 
+                                   placeholder="Enter your password" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="modalRememberMe" name="RememberMe">
+                        <label class="form-check-label" for="modalRememberMe">
+                            Remember me for 7 days
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="modalLoginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> Use any username from Users table
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Toast -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="loginSuccessToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Login Successful!</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Welcome to University Management System!
+        </div>
+    </div>
+</div>
+
+<!-- User Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4" id="userNavbar" style="display: none;">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-graduation-cap"></i> UMS
+        </a>
+        <div class="navbar-nav ms-auto d-flex align-items-center">
+            <div class="navbar-text me-3">
+                <i class="fas fa-user-circle"></i> Welcome, <span id="userFirstName"></span>!
+            </div>
+            <button class="btn btn-outline-light btn-sm" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="hero-section">
+    <h1 class="hero-title slide-in-top">
+        <i class="fa-solid fa-graduation-cap"></i> University Management System
+    </h1>
+    <p class="hero-subtitle slide-in-bottom">Manage your students, teachers, and users with our modern MVC application</p>
+</div>
+
+<div class="row justify-content-center mb-5">
+    <div class="col-md-4">
+        <div class="feature-card slide-in-left">
+            <div class="feature-icon">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <h3 class="feature-title">Student Management</h3>
+            <p class="feature-description">Add, view, and manage student information including names, batches, and academic details.</p>
+            <a href="/Students/getstudents" class="btn-gradient">
+                <i class="fa-solid fa-arrow-right"></i> Manage Students
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="feature-card bounce-in-top">
+            <div class="feature-icon">
+                <i class="fa-solid fa-chalkboard-teacher"></i>
+            </div>
+            <h3 class="feature-title">Teacher Management</h3>
+            <p class="feature-description">Organize teacher profiles, subjects taught, and contact information efficiently.</p>
+            <a href="/Teachers/getteachers" class="btn-gradient">
+                <i class="fa-solid fa-arrow-right"></i> Manage Teachers
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="feature-card slide-in-right">
+            <div class="feature-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <h3 class="feature-title">User Management</h3>
+            <p class="feature-description">Handle user accounts, credentials, and access permissions for the system.</p>
+            <a href="/Users/getusers" class="btn-gradient">
+                <i class="fa-solid fa-arrow-right"></i> Manage Users
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Check login status on page load
+    checkLoginStatus();
+    
+    // Modal login form
+    $('#modalLoginForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const $btn = $('#modalLoginBtn');
+        const $alertContainer = $('#loginAlertContainer');
+        
+        $btn.html('<span class="spinner-border spinner-border-sm me-2"></span>Signing in...').prop('disabled', true);
+        $alertContainer.empty();
+        
+        const formData = {
+            Username: $('#modalUsername').val(),
+            Password: $('#modalPassword').val(),
+            RememberMe: $('#modalRememberMe').is(':checked')
+        };
+        
+        $.ajax({
+            url: '/Account/Login',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    $('#loginModal').modal('hide');
+                    $('#loginSuccessToast .toast-body').html(`Welcome ${response.firstName || 'User'}!`);
+                    $('#loginSuccessToast').toast('show');
+                    
+                    setTimeout(function() {
+                        checkLoginStatus();
+                    }, 1000);
+                } else {
+                    $alertContainer.html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> ${response.message}
+                        </div>
+                    `);
+                    $btn.html('<i class="fas fa-sign-in-alt"></i> Sign In').prop('disabled', false);
+                }
+            },
+            error: function() {
+                $alertContainer.html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> An error occurred. Please try again.
+                    </div>
+                `);
+                $btn.html('<i class="fas fa-sign-in-alt"></i> Sign In').prop('disabled', false);
+            }
+        });
+    });
+    
+    // Logout button
+    $(document).on('click', '#logoutBtn', function() {
+        $.ajax({
+            url: '/Account/Logout',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = response.redirectUrl;
+                }
+            }
+        });
+    });
+    
+    // Check login status
+    function checkLoginStatus() {
+        $.ajax({
+            url: '/Account/CheckLogin',
+            type: 'GET',
+            success: function(response) {
+                if (response.loggedIn) {
+                    $('#userNavbar').show();
+                    $('#userFirstName').text(response.firstName);
+                    
+                    // Show role-based content
+                    showRoleBasedContent(response.role);
+                    
+                    $('.login-prompt').hide();
+                } else {
+                    setTimeout(function() {
+                        $('#loginModal').modal('show');
+                    }, 1000);
+                }
+            }
+        });
+    }
+    
+    // Show role-based content (simplified - no roles)
+    function showRoleBasedContent(role) {
+        // Since we removed roles, just show admin features
+        $('.role-badge').html('<span class="badge bg-danger">Admin</span>');
+    }
+    
+    // Clear modal on hide
+    $('#loginModal').on('hidden.bs.modal', function() {
+        $('#modalLoginForm')[0].reset();
+        $('#loginAlertContainer').empty();
+        $('#modalLoginBtn').html('<i class="fas fa-sign-in-alt"></i> Sign In').prop('disabled', false);
+    });
+});
+</script>
+
