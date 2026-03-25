@@ -1,11 +1,9 @@
+# Ignore Razor views (they appear as HTML)
+*.cshtml linguist-vendored
 
-# Ignore build output
+# Keep your existing rules
 bin/** linguist-vendored
 obj/** linguist-vendored
-
-# Ignore static web files
 wwwroot/** linguist-vendored
-
-# Ignore generated files
 *.min.css linguist-vendored
 *.min.js linguist-vendored
