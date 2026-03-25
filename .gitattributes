@@ -1,1 +1,11 @@
 
+# Ignore build output
+bin/** linguist-vendored
+obj/** linguist-vendored
+
+# Ignore static web files
+wwwroot/** linguist-vendored
+
+# Ignore generated files
+*.min.css linguist-vendored
+*.min.js linguist-vendored
